@@ -6,7 +6,8 @@ namespace ConexaoSolidaria.Messaging;
 
 public static class MassTransitExtensions
 {
-    // Lê RabbitMq:Host/User/Pass (ConfigMap + Secret); falha se faltar. Registra retry padrão.
+    // Lê RabbitMq:Host/User/Pass (ConfigMap + Secret) e RabbitMq:Port (opcional, padrão 5672); falha se faltar.
+    // Registra retry padrão.
     // MassTransit fica na 8.x: a 9.x tem licença comercial.
     public static IServiceCollection AddConexaoMessaging(
         this IServiceCollection services,
@@ -20,7 +21,8 @@ public static class MassTransitExtensions
 
             x.UsingRabbitMq((ctx, bus) =>
             {
-                bus.Host(Required(cfg, "RabbitMq:Host"), h =>
+                var porta = ushort.TryParse(cfg["RabbitMq:Port"], out var p) ? p : (ushort)5672;
+                bus.Host(Required(cfg, "RabbitMq:Host"), porta, "/", h =>
                 {
                     h.Username(Required(cfg, "RabbitMq:User"));
                     h.Password(Required(cfg, "RabbitMq:Pass"));
