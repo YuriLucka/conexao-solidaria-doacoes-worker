@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/building-blocks/">
+    <Project Path="building-blocks/ConexaoSolidaria.Contracts/ConexaoSolidaria.Contracts.csproj" />
+    <Project Path="building-blocks/ConexaoSolidaria.Messaging/ConexaoSolidaria.Messaging.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Doacoes.Worker/Doacoes.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Doacoes.Tests/Doacoes.Tests.csproj" />
+  </Folder>
+</Solution>

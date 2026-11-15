@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doacoes-worker
+  namespace: conexao-solidaria
+  labels:
+    app: doacoes-worker
+spec:
+  # No vídeo: "kubectl scale deploy/doacoes-worker --replicas=0" deixa a mensagem visível na fila do RabbitMQ.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doacoes-worker
+  template:
+    metadata:
+      labels:
+        app: doacoes-worker
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: doacoes-worker
+          image: ghcr.io/yurilucka/conexao-solidaria-doacoes-worker:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: doacoes-worker-config
+          env:
+            # Segredos criados pelo script da orquestração a partir do .env (nada versionado).
+            - name: ConnectionStrings__Postgres
+              valueFrom:
+                secretKeyRef: { name: conexao-secrets, key: POSTGRES_CONNECTION }
+            - name: RabbitMq__User
+              valueFrom:
+                secretKeyRef: { name: conexao-secrets, key: RABBIT_USER }
+            - name: RabbitMq__Pass
+              valueFrom:
+                secretKeyRef: { name: conexao-secrets, key: RABBIT_PASS }
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 50m
+            limits:
+              memory: 320Mi
+          startupProbe:
+            httpGet: { path: /health/live, port: http }
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet: { path: /health/live, port: http }
+            periodSeconds: 15
+            failureThreshold: 4

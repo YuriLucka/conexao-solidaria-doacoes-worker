@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.5.12" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.12" />
+  </ItemGroup>
+</Project>

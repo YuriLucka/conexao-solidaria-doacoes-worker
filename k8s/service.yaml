@@ -1,0 +1,15 @@
+# Sem tráfego de negócio: o Service existe para o Prometheus (/metrics), o Zabbix (/health) e o Kong (/status).
+apiVersion: v1
+kind: Service
+metadata:
+  name: doacoes-worker
+  namespace: conexao-solidaria
+  labels:
+    app: doacoes-worker
+spec:
+  selector:
+    app: doacoes-worker
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
