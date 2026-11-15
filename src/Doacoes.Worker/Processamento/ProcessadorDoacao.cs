@@ -71,7 +71,14 @@ public class ProcessadorDoacao : IProcessadorDoacao
         }
         else
         {
-            var motivo = $"Campanha com status {statusCampanha} no momento do processamento.";
+            // Texto exibido ao doador no acompanhamento da doação.
+            var situacao = statusCampanha switch
+            {
+                "Concluida" => "a campanha foi concluída",
+                "Cancelada" => "a campanha foi cancelada",
+                _ => "o prazo da campanha terminou"
+            };
+            var motivo = $"Doação não contabilizada: {situacao} antes do processamento. Você pode apoiar outra campanha ativa.";
             await AtualizarDoacaoAsync(conexao, transacao, doacaoId, "Rejeitada", motivo, agora, ct);
         }
 
