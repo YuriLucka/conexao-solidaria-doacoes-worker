@@ -57,7 +57,7 @@ public class DoacaoRecebidaConsumer : IConsumer<DoacaoRecebidaEvent>
     }
 
     // O painel público passa a mostrar o valor novo na próxima leitura. Falha do Redis não desfaz o processamento:
-    // o cache expira sozinho em 60 s.
+    // o cache expira sozinho em 30 s (TTL definido pela API).
     private async Task InvalidarPainelAsync()
     {
         try

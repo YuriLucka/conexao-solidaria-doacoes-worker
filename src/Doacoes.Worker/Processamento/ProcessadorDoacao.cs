@@ -33,7 +33,7 @@ public class ProcessadorDoacao : IProcessadorDoacao
             await using var leitor = await cmd.ExecuteReaderAsync(ct);
             if (!await leitor.ReadAsync(ct))
                 return ResultadoProcessamento.NaoEncontrada;
-            if (leitor.GetString(2) != "Pendente")
+            if (leitor.GetString(2) != StatusBanco.DoacaoPendente)
                 return ResultadoProcessamento.JaProcessada;
 
             campanhaId = leitor.GetGuid(0);
@@ -57,7 +57,7 @@ public class ProcessadorDoacao : IProcessadorDoacao
 
         // A doação foi aceita pela API dentro do prazo; o atraso do worker não a invalida.
         // Só é rejeitada se a campanha foi concluída ou cancelada antes do processamento.
-        var aceita = statusCampanha == "Ativa" && criadaEm <= dataFim;
+        var aceita = statusCampanha == StatusBanco.CampanhaAtiva && criadaEm <= dataFim;
         if (aceita)
         {
             await using (var cmd = new NpgsqlCommand(
@@ -67,19 +67,19 @@ public class ProcessadorDoacao : IProcessadorDoacao
                 cmd.Parameters.AddWithValue("id", campanhaId);
                 await cmd.ExecuteNonQueryAsync(ct);
             }
-            await AtualizarDoacaoAsync(conexao, transacao, doacaoId, "Processada", null, agora, ct);
+            await AtualizarDoacaoAsync(conexao, transacao, doacaoId, StatusBanco.DoacaoProcessada, null, agora, ct);
         }
         else
         {
             // Texto exibido ao doador no acompanhamento da doação.
             var situacao = statusCampanha switch
             {
-                "Concluida" => "a campanha foi concluída",
-                "Cancelada" => "a campanha foi cancelada",
+                StatusBanco.CampanhaConcluida => "a campanha foi concluída",
+                StatusBanco.CampanhaCancelada => "a campanha foi cancelada",
                 _ => "o prazo da campanha terminou"
             };
             var motivo = $"Doação não contabilizada: {situacao} antes do processamento. Você pode apoiar outra campanha ativa.";
-            await AtualizarDoacaoAsync(conexao, transacao, doacaoId, "Rejeitada", motivo, agora, ct);
+            await AtualizarDoacaoAsync(conexao, transacao, doacaoId, StatusBanco.DoacaoRejeitada, motivo, agora, ct);
         }
 
         await transacao.CommitAsync(ct);
