@@ -1,6 +1,6 @@
 # Conexão Solidária - Doações Worker
 
-Microsserviço consumidor da plataforma Conexão Solidária (Hackathon FIAP Pós Tech 11NETT, Fase 5).
+Microsserviço consumidor da plataforma Conexão Solidária (Hackathon FIAP Pós Tech 11NETT, Grupo 31).
 Instruções para subir a solução inteira: repositório [conexao-solidaria-orchestration](https://github.com/YuriLucka/conexao-solidaria-orchestration).
 
 ## O que faz
